@@ -1,0 +1,114 @@
+-- Membuat tabel tabel_pengguna
+create table Tabel_Pengguna (
+  id_pengguna serial primary key,
+  nama_pengguna varchar(225) not null,
+  role varchar(225) not null check (role in('Staff', 'Petugas', 'Admin'))
+);
+
+
+-- Membuat tabel tabel_barang
+create table Tabel_Barang (
+  id_barang serial primary key,
+  nama_barang varchar(225) not null,
+  kategori varchar(225),
+  stok_total int not null,
+  stok_tersedia int not null,
+  stok_rusak int default 0
+);
+
+
+-- Membuat tabel tabel_peminjaman
+create table Tabel_Peminjaman (
+  id_peminjaman serial primary key,
+  id_barang int references Tabel_Barang(id_barang),
+  id_pengguna int references Tabel_Pengguna(id_pengguna),
+  tgl_request timestamp default now(),
+  tgl_setuju timestamp,
+  tgl_kembali timestamp,
+  status_pinjam VARCHAR(50) not null check (status_pinjam in ('Diajukan', 'Disetujui', 'Kembali', 'Ditolak'))
+);
+
+-- Membuat fungsi untuk melakukan permintaan meminjam
+create or replace function request_pinjam(
+    p_id_pengguna INT,
+    p_id_barang INT
+)
+returns text
+language plpgsql
+as $$
+begin
+    insert into Tabel_Peminjaman (id_pengguna, id_barang, status_pinjam, tgl_request)
+    values (p_id_pengguna, p_id_barang, 'Diajukan', NOW());
+    return 'Permintaan berhasil diajukan';
+end;
+$$;
+
+
+-- Membuat fungsi untuk menyetujui peminjaman (Logika Transaksi)
+create or replace function setujui_pinjam(
+  p_id_peminjaman INT
+)
+returns text
+language plpgsql
+as $$
+declare
+    v_id_barang INT;
+    stok_saat_ini INT;
+begin
+  select id_barang into v_id_barang from Tabel_Peminjaman
+  where id_peminjaman = p_id_peminjaman;
+
+
+  select stok_tersedia into stok_saat_ini from Tabel_Barang
+  where id_barang = v_id_barang for UPDATE;
+
+
+  if stok_saat_ini > 0 then
+    update Tabel_Barang
+    set stok_tersedia = stok_tersedia - 1
+    where id_barang = v_id_barang;
+
+
+    update Tabel_Peminjaman
+    set status_pinjam = 'Disetujui', tgl_setuju = now()
+    where id_peminjaman = p_id_peminjaman;
+     
+    return 'Peminjaman disetujui'; 
+  else
+    return 'Stok barang habis'; 
+  end if;
+
+
+exception
+  when others then
+  return 'Error: Transaksi gagal';
+end;
+$$;
+
+
+-- Membuat fungsi untuk memproses pengembalian
+create or replace function kembalikan_barang(
+  p_id_peminjaman INT
+)
+returns text
+language plpgsql
+as $$
+declare
+  v_id_barang INT;
+begin
+  select id_barang into v_id_barang from Tabel_Peminjaman
+  where id_peminjaman = p_id_peminjaman;
+
+
+  update Tabel_Barang
+  set stok_tersedia = stok_tersedia + 1
+  where id_barang = v_id_barang;
+
+
+  update Tabel_Peminjaman
+  set status_pinjam = 'Kembali', tgl_kembali = now()
+  where id_peminjaman = p_id_peminjaman;
+ 
+  return 'Barang berhasil dikembalikan';
+end;
+$$;

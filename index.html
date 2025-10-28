@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ujikom Peminjaman Barang</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <header>
+        <h1>Aplikasi Ujikom Peminjaman Barang</h1>
+    </header>
+
+    <main>
+        <section id="input-section">
+            
+            <div class="form-group">
+                <h3>1. Request Pinjam (Staff)</h3>
+                <label for="req-pengguna-id">ID Pengguna (Staff):</label>
+                <input type="number" id="req-pengguna-id" placeholder="Contoh: 1 (Haykal)">
+                <label for="req-barang-id">ID Barang:</label>
+                <input type="number" id="req-barang-id" placeholder="Contoh: 1 (Proyektor)">
+                <button id="btn-request">Request Pinjam</button>
+            </div>
+            
+            <div class="form-group">
+                <h3>2. Setujui Pinjaman (Petugas)</h3>
+                <label for="setuju-pinjam-id">ID Peminjaman:</label>
+                <input type="number" id="setuju-pinjam-id" placeholder="Contoh: 1">
+                <button id="btn-setuju">Setujui</button>
+            </div>
+            
+            <div class="form-group">
+                <h3>3. Kembalikan Barang (Petugas)</h3>
+                <label for="kembali-pinjam-id">ID Peminjaman:</label>
+                <input type="number" id="kembali-pinjam-id" placeholder="Contoh: 1">
+                <button id="btn-kembali">Kembalikan</button>
+            </div>
+        </section>
+        <section id="admin-section">
+            <h2>Manajemen Barang (Petugas/Admin)</h2>
+            
+            <div class="form-group">
+                <h3>4. Tambah Barang Baru</h3>
+                <label for="add-nama">Nama Barang:</label>
+                <input type="text" id="add-nama" placeholder="Contoh: Laptop HP Elitebook">
+                <label for="add-kategori">Kategori:</label>
+                <input type="text" id="add-kategori" placeholder="Contoh: Komputer">
+                <label for="add-stok-total">Stok Total:</label>
+                <input type="number" id="add-stok-total" placeholder="Contoh: 15">
+                <button id="btn-add-barang">Tambah Barang</button>
+            </div>
+
+            <div class="form-group">
+                <h3>5. Update Stok Barang</h3>
+                <label for="update-id">ID Barang yang di-Update:</label>
+                <input type="number" id="update-id" placeholder="Contoh: 1">
+                <label for="update-stok-tersedia">Stok Tersedia (Baru):</label>
+                <input type="number" id="update-stok-tersedia" placeholder="Contoh: 8">
+                <label for="update-stok-rusak">Stok Rusak (Baru):</label>
+                <input type="number" id="update-stok-rusak" placeholder="Contoh: 2">
+                <button id="btn-update-stok">Update Stok</button>
+            </div>
+            
+            <div class="form-group">
+                <h3>6. Hapus Barang</h3>
+                <label for="delete-id">ID Barang yang akan Dihapus:</label>
+                <input type="number" id="delete-id" placeholder="Contoh: 3">
+                <button id="btn-delete-barang">HAPUS Barang</button>
+            </div>
+
+        </section>
+        <section id="data-view-section">
+            <h2>Data Tabel Real-time</h2>
+            <button id="btn-refresh-data">Refresh Data</button>
+            
+            <h3>Tabel Status Barang</h3>
+            <div id="barang-table-container">
+                <p>Mengambil data barang...</p>
+            </div>
+
+            <h3>Tabel Log Peminjaman</h3>
+            <div id="peminjaman-table-container">
+                <p>Mengambil data peminjaman...</p>
+            </div>
+        </section>
+        <section id="output-section">
+            <h2>Output Log (Hasil dari Database)</h2>
+            <div id="output-log">
+                <p>Aksi Anda akan tercatat di sini...</p>
+            </div>
+            <button id="btn-clear-log">Bersihkan Log</button>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+
+</body>
+</html>
